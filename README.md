@@ -286,19 +286,6 @@ Contributions are welcome! Please follow these steps:
 
 ---
 
-## 🗺️ Roadmap
-
-- [ ] User authentication & authorization
-- [ ] Cloud database migration (PostgreSQL/MySQL)
-- [ ] Advanced analytics dashboard with charts
-- [ ] Export progress to PDF/CSV
-- [ ] Mobile application (React Native)
-- [ ] Study group collaboration features
-- [ ] AI-powered study recommendations
-- [ ] Gamification & achievements system
-
----
-
 ## 📄 License
 
 This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
