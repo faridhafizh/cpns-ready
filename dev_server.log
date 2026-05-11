@@ -1,0 +1,13 @@
+
+> cpns-ready-crm@0.1.0 dev
+> next dev
+
+  ▲ Next.js 14.2.35
+  - Local:        http://localhost:3000
+
+ ✓ Starting...
+ ✓ Ready in 1900ms
+ ○ Compiling / ...
+ ✓ Compiled / in 6.8s (531 modules)
+ GET / 200 in 7566ms
+ ✓ Compiled in 771ms (269 modules)

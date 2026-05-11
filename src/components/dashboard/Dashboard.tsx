@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { BookOpen, Target, TrendingUp, Calendar, CheckCircle, Clock, Award, LayoutDashboard, BarChart3 } from 'lucide-react'
+import { BookOpen, Target, TrendingUp, Calendar, CheckCircle, Clock, Award, LayoutDashboard, BarChart3, Menu, X } from 'lucide-react'
 import Timeline from './Timeline'
 import Progress from './Progress'
 
@@ -13,6 +13,7 @@ export default function Dashboard() {
   const [currentView, setCurrentView] = useState<View>('dashboard')
   const [currentWeek, setCurrentWeek] = useState(1)
   const [darkMode, setDarkMode] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [stats, setStats] = useState({
     completedTasks: 0,
     totalTasks: 84,
@@ -195,52 +196,113 @@ export default function Dashboard() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-950 dark:to-slate-900">
       {/* Header */}
       <header className="border-b bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-emerald-500 rounded-lg flex items-center justify-center">
-              <BookOpen className="w-6 h-6 text-white" />
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 shrink-0 bg-gradient-to-br from-blue-500 to-emerald-500 rounded-lg flex items-center justify-center">
+                <BookOpen className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-lg md:text-xl font-bold bg-gradient-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent">
+                  CPNS-Ready CRM
+                </h1>
+                <p className="text-xs text-muted-foreground hidden sm:block">Study Planner & Tracker</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent">
-                CPNS-Ready CRM
-              </h1>
-              <p className="text-xs text-muted-foreground">Study Planner & Tracker</p>
+
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center gap-2">
+              <Button
+                variant={currentView === 'dashboard' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setCurrentView('dashboard')}
+              >
+                <LayoutDashboard className="h-4 w-4 mr-2" />
+                Dashboard
+              </Button>
+              <Button
+                variant={currentView === 'timeline' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setCurrentView('timeline')}
+              >
+                <Calendar className="h-4 w-4 mr-2" />
+                Timeline
+              </Button>
+              <Button
+                variant={currentView === 'progress' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setCurrentView('progress')}
+              >
+                <BarChart3 className="h-4 w-4 mr-2" />
+                Progress
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={toggleDarkMode}
+                className="ml-2"
+              >
+                {darkMode ? <span className="text-lg">☀️</span> : <span className="text-lg">🌙</span>}
+              </Button>
+            </div>
+
+            {/* Mobile Actions */}
+            <div className="flex md:hidden items-center gap-2">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={toggleDarkMode}
+              >
+                {darkMode ? <span className="text-lg">☀️</span> : <span className="text-lg">🌙</span>}
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              >
+                {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              </Button>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant={currentView === 'dashboard' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setCurrentView('dashboard')}
-            >
-              <LayoutDashboard className="h-4 w-4 mr-2" />
-              Dashboard
-            </Button>
-            <Button
-              variant={currentView === 'timeline' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setCurrentView('timeline')}
-            >
-              <Calendar className="h-4 w-4 mr-2" />
-              Timeline
-            </Button>
-            <Button
-              variant={currentView === 'progress' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setCurrentView('progress')}
-            >
-              <BarChart3 className="h-4 w-4 mr-2" />
-              Progress
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={toggleDarkMode}
-              className="ml-2"
-            >
-              {darkMode ? <span className="text-lg">☀️</span> : <span className="text-lg">🌙</span>}
-            </Button>
-          </div>
+
+          {/* Mobile Menu */}
+          {isMobileMenuOpen && (
+            <div className="md:hidden mt-4 pt-4 border-t border-gray-200 dark:border-gray-800 flex flex-col gap-2">
+              <Button
+                variant={currentView === 'dashboard' ? 'default' : 'ghost'}
+                className="w-full justify-start"
+                onClick={() => {
+                  setCurrentView('dashboard')
+                  setIsMobileMenuOpen(false)
+                }}
+              >
+                <LayoutDashboard className="h-4 w-4 mr-2" />
+                Dashboard
+              </Button>
+              <Button
+                variant={currentView === 'timeline' ? 'default' : 'ghost'}
+                className="w-full justify-start"
+                onClick={() => {
+                  setCurrentView('timeline')
+                  setIsMobileMenuOpen(false)
+                }}
+              >
+                <Calendar className="h-4 w-4 mr-2" />
+                Timeline
+              </Button>
+              <Button
+                variant={currentView === 'progress' ? 'default' : 'ghost'}
+                className="w-full justify-start"
+                onClick={() => {
+                  setCurrentView('progress')
+                  setIsMobileMenuOpen(false)
+                }}
+              >
+                <BarChart3 className="h-4 w-4 mr-2" />
+                Progress
+              </Button>
+            </div>
+          )}
         </div>
       </header>
 
