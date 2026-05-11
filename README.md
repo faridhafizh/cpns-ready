@@ -300,14 +300,6 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 ---
 
-## 📧 Contact & Support
-
-- **Issues**: [GitHub Issues](https://github.com/yourusername/cpns-ready-crm/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/cpns-ready-crm/discussions)
-- **Email**: your.email@example.com
-
----
-
 <div align="center">
   
   **Made with ❤️ for CPNS aspirants**
