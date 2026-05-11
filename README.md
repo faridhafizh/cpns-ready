@@ -1,159 +1,330 @@
-# CPNS-Ready CRM
+<div align="center">
+  
+  ![CPNS-Ready CRM](https://img.shields.io/badge/CPNS-Ready%20CRM-blue?style=for-the-badge&logo=bookstack&logoColor=white)
+  
+  **A Modern CRM-Style Study Management System for CPNS Exam Preparation**
+  
+  [![Next.js](https://img.shields.io/badge/Next.js-14-black?style=flat-square&logo=next.js)](https://nextjs.org/)
+  [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
+  [![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-38B2AC?style=flat-square&logo=tailwind-css)](https://tailwindcss.com/)
+  [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 
-Modern CRM-style CPNS study planner and tracker built with Next.js, TypeScript, and Tailwind CSS.
+  [Features](#-features) • [Installation](#-installation) • [Documentation](#-documentation) • [Contributing](#-contributing)
 
-## Features
+</div>
 
-- **CRM-Style Dashboard**: Professional interface with KPI cards and statistics
-- **12-Week Study Plan**: Structured 12-week CPNS preparation program
-- **Progress Tracking**: Real-time progress monitoring with visual indicators
-- **Timeline View**: Interactive timeline to manage weekly study plans
-- **Dark Mode**: Built-in dark mode support
-- **Responsive Design**: Fully responsive for mobile and desktop
-- **Data Persistence**: LocalStorage-based progress tracking (with migration support)
-- **SQLite Database**: Prisma ORM with SQLite for future database integration
+---
 
-## Tech Stack
+## 🎯 Overview
 
-- **Frontend**: Next.js 14 with TypeScript
-- **Styling**: Tailwind CSS + shadcn/ui components
-- **Database**: SQLite with Prisma ORM (configured, optional)
-- **Icons**: Lucide React
-- **Charts**: Recharts (for future analytics)
+**CPNS-Ready CRM** is a comprehensive study management platform designed specifically for Indonesian Civil Service (CPNS) exam preparation. Built with modern web technologies, it provides a structured 12-week study program with professional CRM-style tracking and analytics.
 
-## Project Structure
+### Why CPNS-Ready CRM?
+
+- **Structured Learning Path**: Pre-configured 12-week curriculum covering TWK, TIU, TKP, and CAT simulation
+- **Professional Interface**: CRM-inspired dashboard with real-time KPI tracking
+- **Progress Analytics**: Visual progress monitoring with detailed statistics and insights
+- **Flexible & Customizable**: Easily adaptable to different study plans and subjects
+- **Offline-First**: LocalStorage persistence with optional database integration
+
+---
+
+## ✨ Features
+
+### 📊 **CRM-Style Dashboard**
+- Real-time KPI cards (completed tasks, active weeks, progress %, study streak)
+- Overall progress visualization with motivational milestones
+- Quick navigation to key sections
+
+### 📅 **Interactive Timeline**
+- 12-week structured study program
+- Daily task breakdown with checkboxes
+- Visual progress indicators per week
+- Color-coded monthly phases (Foundation → Deep Learning → Mock Exams)
+
+### 📈 **Progress Tracking**
+- Detailed weekly progress statistics
+- Completion rate analytics
+- Study streak monitoring
+- Progress reset functionality
+
+### 🎨 **Modern UI/UX**
+- Dark mode support
+- Fully responsive design (mobile, tablet, desktop)
+- Professional shadcn/ui components
+- Smooth animations and transitions
+
+### 💾 **Data Management**
+- LocalStorage-based persistence
+- Automatic data migration from legacy versions
+- Optional SQLite database integration via Prisma ORM
+
+---
+
+## 🛠️ Tech Stack
+
+| Category | Technology |
+|----------|-----------|
+| **Framework** | [Next.js 14](https://nextjs.org/) (App Router) |
+| **Language** | [TypeScript](https://www.typescriptlang.org/) |
+| **Styling** | [Tailwind CSS](https://tailwindcss.com/) |
+| **UI Components** | [shadcn/ui](https://ui.shadcn.com/) |
+| **Icons** | [Lucide React](https://lucide.dev/) |
+| **Database** | [Prisma ORM](https://www.prisma.io/) + SQLite |
+| **Charts** | [Recharts](https://recharts.org/) |
+| **State Management** | React Hooks + LocalStorage |
+
+---
+
+## 📦 Installation
+
+### Prerequisites
+
+Ensure you have the following installed:
+
+- **Node.js** 18.17 or higher
+- **npm** or **yarn** or **pnpm**
+
+### Quick Start
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/cpns-ready-crm.git
+cd cpns-ready-crm
+
+# Install dependencies
+npm install
+
+# Run development server
+npm run dev
+
+# Open http://localhost:3000 in your browser
+```
+
+### Database Setup (Optional)
+
+To enable SQLite database:
+
+```bash
+# Generate Prisma client
+npx prisma generate
+
+# Run database migrations
+npx prisma migrate dev --name init
+
+# Database file will be created at prisma/dev.db
+```
+
+---
+
+## 📁 Project Structure
 
 ```
 cpns-ready-crm/
 ├── src/
-│   ├── app/                 # Next.js app directory
-│   │   ├── layout.tsx      # Root layout
-│   │   ├── page.tsx        # Home page
-│   │   └── globals.css     # Global styles
-│   ├── components/         # React components
-│   │   ├── dashboard/      # Dashboard components
-│   │   │   ├── Dashboard.tsx
-│   │   │   ├── Timeline.tsx
-│   │   │   └── Progress.tsx
-│   │   └── ui/             # UI components (shadcn/ui)
+│   ├── app/                    # Next.js App Router
+│   │   ├── layout.tsx          # Root layout with providers
+│   │   ├── page.tsx            # Home page (dashboard)
+│   │   └── globals.css         # Global styles & Tailwind imports
+│   ├── components/
+│   │   ├── dashboard/          # Feature components
+│   │   │   ├── Dashboard.tsx   # Main dashboard view
+│   │   │   ├── Timeline.tsx    # Study timeline component
+│   │   │   └── Progress.tsx    # Progress tracker
+│   │   └── ui/                 # Reusable UI components (shadcn)
 │   │       ├── card.tsx
-│   │       └── button.tsx
-│   └── lib/                # Utility functions
-│       ├── utils.ts
-│       ├── prisma.ts
-│       └── study-plan.ts
-├── prisma/                 # Prisma schema
-│   └── schema.prisma
-└── public/                 # Static assets
+│   │       ├── button.tsx
+│   │       └── ...
+│   └── lib/                    # Utilities & configurations
+│       ├── utils.ts            # Helper functions
+│       ├── prisma.ts           # Prisma client singleton
+│       └── study-plan.ts       # CPNS study plan data
+├── prisma/
+│   ├── schema.prisma           # Database schema
+│   └── dev.db                  # SQLite database (generated)
+├── public/                     # Static assets
+├── tailwind.config.ts          # Tailwind configuration
+├── tsconfig.json               # TypeScript configuration
+└── package.json                # Project dependencies
 ```
 
-## Getting Started
+---
 
-### Prerequisites
+## 📖 Documentation
 
-- Node.js 18+ 
-- npm or yarn
+### Study Plan Structure
 
-### Installation
+The 12-week CPNS preparation program:
 
-1. Install dependencies:
+| Phase | Weeks | Focus | Subjects |
+|-------|-------|-------|----------|
+| **Foundation** | 1-4 | Basic concepts | TWK, TIU, TKP, CAT Introduction |
+| **Deep Learning** | 5-8 | Intensive practice | Advanced topics, problem-solving |
+| **Mock Exams** | 9-12 | Exam simulation | Full tryouts, time management |
+
+Each week contains:
+- **7 daily tasks** with specific learning objectives
+- **Subject categorization** (TWK/TIU/TKP/CAT/Review)
+- **Duration estimates** for time management
+- **Completion tracking** with persistent storage
+
+### Customization Guide
+
+#### Modify Study Plan
+
+Edit `src/lib/study-plan.ts`:
+
+```typescript
+export const studyPlan = [
+  {
+    week: 1,
+    month: "Bulan 1: Dasar",
+    tasks: [
+      {
+        id: "week1-day1",
+        day: 1,
+        subject: "Your Custom Subject",
+        material: "Your learning material",
+        type: "TWK" // or TIU, TKP, CAT, Review
+      },
+      // ... more tasks
+    ]
+  },
+  // ... more weeks
+];
+```
+
+#### Customize Styling
+
+Update `tailwind.config.ts` for theme customization:
+
+```typescript
+export default {
+  theme: {
+    extend: {
+      colors: {
+        primary: {
+          // Your custom color palette
+        }
+      }
+    }
+  }
+}
+```
+
+#### Database Schema
+
+Modify `prisma/schema.prisma` for custom data models:
+
+```prisma
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  progress  Progress[]
+  createdAt DateTime @default(now())
+}
+
+model Progress {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  weekId    Int
+  completed Boolean  @default(false)
+  // ... more fields
+}
+```
+
+---
+
+## 🚢 Deployment
+
+### Deploy to Vercel (Recommended)
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/yourusername/cpns-ready-crm)
+
+**Manual Deployment:**
+
 ```bash
-npm install
+# Push to GitHub
+git push origin main
+
+# Import project in Vercel Dashboard
+# 1. Go to vercel.com/new
+# 2. Import your repository
+# 3. Click Deploy
+
+# Your app will be live at: https://your-app.vercel.app
 ```
 
-2. Run the development server:
-```bash
-npm run dev
+### Environment Variables
+
+For production with database:
+
+```env
+DATABASE_URL="postgresql://user:password@host:5432/dbname"
 ```
 
-3. Open [http://localhost:3000](http://localhost:3000) in your browser
+---
 
-### Database Setup (Optional)
+## 🤝 Contributing
 
-The application currently uses localStorage for data persistence. To use SQLite database:
+Contributions are welcome! Please follow these steps:
 
-1. Generate Prisma client:
-```bash
-npx prisma generate
-```
+1. **Fork** the repository
+2. **Create** a feature branch (`git checkout -b feature/AmazingFeature`)
+3. **Commit** your changes (`git commit -m 'Add some AmazingFeature'`)
+4. **Push** to the branch (`git push origin feature/AmazingFeature`)
+5. **Open** a Pull Request
 
-2. Run migrations:
-```bash
-npx prisma migrate dev --name init
-```
+### Development Guidelines
 
-3. The database file will be created at `prisma/dev.db`
+- Follow TypeScript best practices
+- Use conventional commits
+- Write meaningful commit messages
+- Add tests for new features
+- Update documentation
 
-## Deployment
+---
 
-### Vercel Deployment
+## 🗺️ Roadmap
 
-1. Push your code to GitHub
-2. Import project in Vercel
-3. Deploy automatically
+- [ ] User authentication & authorization
+- [ ] Cloud database migration (PostgreSQL/MySQL)
+- [ ] Advanced analytics dashboard with charts
+- [ ] Export progress to PDF/CSV
+- [ ] Mobile application (React Native)
+- [ ] Study group collaboration features
+- [ ] AI-powered study recommendations
+- [ ] Gamification & achievements system
 
-Note: For production with SQLite, consider using a cloud database like PostgreSQL or MySQL.
+---
 
-## Features Overview
+## 📄 License
 
-### Dashboard
-- Overview statistics (completed tasks, active weeks, progress percentage, streak)
-- Overall progress bar with motivational messages
-- Quick action cards to navigate to Timeline and Progress sections
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
 
-### Timeline
-- 12-week interactive timeline
-- Weekly study plan cards with progress indicators
-- Task completion tracking with checkboxes
-- Month-based color coding (Bulan 1: Dasar, Bulan 2: Pendalaman, Bulan 3: Tryout)
+---
 
-### Progress Tracker
-- Detailed progress statistics
-- Weekly progress bars
-- Reset progress functionality
-- Visual progress indicators
+## 🙏 Acknowledgments
 
-## Study Plan Structure
+- [shadcn/ui](https://ui.shadcn.com/) for the beautiful component library
+- [Lucide Icons](https://lucide.dev/) for the icon set
+- Indonesian CPNS community for feedback and support
 
-The 12-week program covers:
-- **Week 1-4**: Basic material (TWK, TIU, TKP, CAT introduction)
-- **Week 5-8**: Deep learning and intensive practice
-- **Week 9-12**: Tryouts and final evaluation
+---
 
-Each week includes 7 daily tasks with:
-- Subject material
-- Learning objectives
-- Duration estimates
-- Subject type (TWK, TIU, TKP, CAT, Review)
+## 📧 Contact & Support
 
-## Data Migration
+- **Issues**: [GitHub Issues](https://github.com/yourusername/cpns-ready-crm/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/yourusername/cpns-ready-crm/discussions)
+- **Email**: your.email@example.com
 
-The application automatically migrates progress data from the original HTML version by reading from `cpns-ready-progress` localStorage key.
+---
 
-## Customization
+<div align="center">
+  
+  **Made with ❤️ for CPNS aspirants**
+  
+  ⭐ Star this repo if you find it helpful!
 
-### Study Plan
-Modify `src/lib/study-plan.ts` to customize the study plan structure, subjects, and materials.
-
-### Styling
-Update `tailwind.config.ts` and `src/app/globals.css` for custom styling.
-
-### Database Schema
-Modify `prisma/schema.prisma` for database schema changes.
-
-## Future Enhancements
-
-- User authentication system
-- Cloud database integration
-- Advanced analytics and charts
-- Export/import functionality
-- Mobile app version
-- Collaboration features
-
-## License
-
-This project is created for CPNS preparation purposes.
-
-## Support
-
-For issues and questions, please refer to the project documentation or create an issue in the repository.
+</div>
