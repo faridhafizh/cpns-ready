@@ -72,7 +72,9 @@ describe('Dashboard Component', () => {
   it('toggles dark mode when moon/sun icon is clicked', () => {
     render(<Dashboard />)
     
-    const darkModeButton = screen.getByRole('button', { name: /🌙|☀️/ })
+    // Use getAllByRole to get the desktop dark mode button which is the first one
+    const darkModeButtons = screen.getAllByRole('button', { name: /🌙|☀️/ })
+    const darkModeButton = darkModeButtons[0]
     expect(darkModeButton).toBeInTheDocument()
     
     // Check if localStorage is called when toggling
