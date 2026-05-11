@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id        String      @id @default(cuid())
+  name      String?
+  email     String?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  studyPlans StudyPlan[]
+  progress  Progress[]
+}
+
+model StudyPlan {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  week        Int
+  month       Int
+  focusArea   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  dailyTasks  DailyTask[]
+}
+
+model DailyTask {
+  id           String    @id @default(cuid())
+  studyPlanId  String
+  studyPlan    StudyPlan @relation(fields: [studyPlanId], references: [id], onDelete: Cascade)
+  day          String
+  material     String
+  target       String
+  duration     String
+  subjectType  String
+  completed    Boolean   @default(false)
+  completedAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  progress     Progress[]
+}
+
+model Progress {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  taskId    String
+  task      DailyTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  completed Boolean   @default(false)
+  streak    Int       @default(0)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@unique([userId, taskId])
+}

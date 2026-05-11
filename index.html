@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CPNS-Ready | 3-Month Study Planner</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com">
+    </script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Poppins', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#0f172a',
+                        accent: '#22c55e',
+                    },
+                    animation: {
+                        'progress-glow': 'glow 2s ease-in-out infinite',
+                        'bounce-slow': 'bounce 3s infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'confetti-fall': 'fall linear forwards',
+                    },
+                    keyframes: {
+                        glow: {
+                            '0%, 100%': { boxShadow: '0 0 15px rgba(37,99,235,0.4)' },
+                            '50%': { boxShadow: '0 0 30px rgba(37,99,235,0.8)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-15px)' },
+                        },
+                    },
+                },
+            },
+        }
+    </script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
+    </script>
+
+    <!-- Google Fonts: Inter & Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --glass-bg-light: rgba(255, 255, 255, 0.65);
+            --glass-bg-dark: rgba(15, 23, 42, 0.7);
+            --glass-border-light: rgba(255, 255, 255, 0.5);
+            --glass-border-dark: rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-card {
+            background: var(--glass-bg-light);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border-light);
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .dark .glass-card {
+            background: var(--glass-bg-dark);
+            border: 1px solid var(--glass-border-dark);
+        }
+        .glass-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(37, 99, 235, 0.15);
+        }
+        .dark .glass-card:hover {
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(37, 99, 235, 0.3);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 20px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+
+        /* Checkbox custom */
+        .custom-checkbox {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            border: 2px solid #d1d5db;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            position: relative;
+            flex-shrink: 0;
+        }
+        .dark .custom-checkbox {
+            border-color: #4b5563;
+        }
+        .custom-checkbox:checked {
+            background: #22c55e;
+            border-color: #22c55e;
+            animation: pop-check 0.3s ease;
+        }
+        .custom-checkbox:checked::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 11px;
+        }
+        @keyframes pop-check {
+            0% {
+                transform: scale(1);
+            }
+            40% {
+                transform: scale(1.3);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* Confetti canvas */
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* Timeline connector line */
+        .timeline-connector {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #2563eb, #22c55e, #2563eb);
+            border-radius: 4px;
+            z-index: 0;
+            opacity: 0.5;
+        }
+        .dark .timeline-connector {
+            opacity: 0.7;
+        }
+
+        /* Pulse dot for active week */
+        .pulse-dot {
+            animation: pulse-dot 2s infinite;
+        }
+        @keyframes pulse-dot {
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.6);
+            }
+            50% {
+                box-shadow: 0 0 0 16px rgba(37, 99, 235, 0);
+            }
+        }
+
+        /* Smooth transitions for dark mode */
+        html {
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+        body {
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+        * {
+            transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100 font-sans antialiased min-h-screen">
+
+    <!-- ==================== CONFETTI CANVAS ==================== -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- ==================== STICKY NAVBAR ==================== -->
+    <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 glass-card shadow-lg transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo -->
+                <a href="#hero" class="flex items-center gap-3 group cursor-pointer no-underline">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                        <i class="fa-solid fa-graduation-cap text-white text-lg"></i>
+                    </div>
+                    <span class="font-extrabold text-xl tracking-tight bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                        CPNS-Ready
+                    </span>
+                </a>
+
+                <!-- Nav Links (Desktop) -->
+                <div class="hidden md:flex items-center gap-6">
+                    <a href="#dashboard" class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200">Dashboard</a>
+                    <a href="#timeline" class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200">Timeline</a>
+                    <a href="#daily-planner" class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200">Planner Harian</a>
+                    <a href="#progress" class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200">Progress</a>
+                </div>
+
+                <!-- Right side: Dark mode toggle + Mobile menu button -->
+                <div class="flex items-center gap-3">
+                    <!-- Dark Mode Toggle -->
+                    <button id="darkModeToggle" aria-label="Toggle dark mode"
+                    class="relative w-14 h-7 bg-gray-300 dark:bg-gray-600 rounded-full cursor-pointer transition-all duration-300 shadow-inner focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-gray-900">
+                    <span id="darkModeKnob" class="absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow-md flex items-center justify-center transition-all duration-300 transform">
+                        <i id="darkModeIcon" class="fa-solid fa-sun text-yellow-500 text-xs"></i>
+                    </span>
+                </button>
+
+                <!-- Mobile menu button -->
+                <button id="mobileMenuBtn" class="md:hidden text-gray-600 dark:text-gray-300 focus:outline-none p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="md:hidden hidden bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg border-t border-gray-200 dark:border-gray-700">
+            <div class="px-4 py-3 space-y-2">
+                <a href="#dashboard" class="block py-2 px-4 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 mobile-nav-link">Dashboard</a>
+                <a href="#timeline" class="block py-2 px-4 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 mobile-nav-link">Timeline</a>
+                <a href="#daily-planner" class="block py-2 px-4 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 mobile-nav-link">Planner Harian</a>
+                <a href="#progress" class="block py-2 px-4 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 mobile-nav-link">Progress</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Spacer for fixed navbar -->
+<div class="h-16"></div>
+
+<!-- ==================== HERO SECTION ==================== -->
+<section id="hero" class="relative overflow-hidden py-16 md:py-24 lg:py-28">
+    <!-- Background decoration -->
+    <div class="absolute inset-0 -z-10 overflow-hidden">
+        <div class="absolute -top-40 -right-40 w-80 h-80 bg-blue-400/20 dark:bg-blue-500/10 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-green-400/20 dark:bg-green-500/10 rounded-full blur-3xl"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-400/10 dark:bg-purple-500/5 rounded-full blur-3xl"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <!-- Badge -->
+        <div class="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 dark:bg-primary/20 rounded-full text-primary font-semibold text-sm mb-6 animate-float">
+            <i class="fa-solid fa-rocket"></i>
+            <span>Persiapan CPNS 2026</span>
+        </div>
+
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-6 leading-tight">
+            Siap Hadapi
+            <span class="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">CPNS</span>
+            dalam 3 Bulan
+        </h1>
+        <p class="text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-8 leading-relaxed">
+            Rencana belajar terstruktur selama 12 minggu dengan target TWK, TIU, TKP, dan simulasi CAT. Pantau progress, centang tugas, dan raih kelulusan CPNS impianmu.
+        </p>
+
+        <!-- CTA Buttons -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-center mb-10">
+            <a href="#daily-planner" class="inline-flex items-center gap-2 px-8 py-3.5 bg-primary text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:bg-blue-700 transition-all duration-300 transform hover:-translate-y-1">
+                <i class="fa-solid fa-play"></i> Mulai Belajar
+            </a>
+            <a href="#timeline" class="inline-flex items-center gap-2 px-8 py-3.5 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 font-semibold rounded-xl shadow-lg hover:shadow-xl border border-gray-200 dark:border-gray-700 transition-all duration-300 transform hover:-translate-y-1">
+                <i class="fa-solid fa-calendar-week"></i> Lihat Timeline
+            </a>
+        </div>
+
+        <!-- Motivation Quote Card -->
+        <div id="quoteCard" class="max-w-lg mx-auto glass-card rounded-2xl p-6 text-center animate-float">
+            <i class="fa-solid fa-quote-right text-3xl text-primary/30 dark:text-primary/40 mb-3"></i>
+            <p id="quoteText" class="text-lg font-medium text-gray-700 dark:text-gray-200 italic leading-relaxed">
+                "Memuat quote..."
+            </p>
+            <p id="quoteAuthor" class="text-sm text-gray-500 dark:text-gray-400 mt-3 font-medium"></p>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== DASHBOARD RINGKASAN ==================== -->
+<section id="dashboard" class="py-12 md:py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-10">
+            <h2 class="text-3xl md:text-4xl font-bold mb-3">Dashboard Ringkasan</h2>
+            <p class="text-gray-500 dark:text-gray-400">Pantau progres persiapan CPNS-mu secara real-time</p>
+        </div>
+
+        <!-- Stats Cards Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-8">
+            <!-- Total Tugas Selesai -->
+            <div class="glass-card rounded-2xl p-5 md:p-6 text-center">
+                <div class="w-12 h-12 bg-green-100 dark:bg-green-900/40 rounded-xl flex items-center justify-center mx-auto mb-3">
+                    <i class="fa-solid fa-check-circle text-green-600 dark:text-green-400 text-xl"></i>
+                </div>
+                <p class="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white" id="statCompleted">0</p>
+                <p class="text-xs md:text-sm text-gray-500 dark:text-gray-400 mt-1">Tugas Selesai</p>
+                <p class="text-[10px] text-gray-400 dark:text-gray-500">dari 84 tugas</p>
+            </div>
+
+            <!-- Minggu Aktif -->
+            <div class="glass-card rounded-2xl p-5 md:p-6 text-center">
+                <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/40 rounded-xl flex items-center justify-center mx-auto mb-3">
+                    <i class="fa-solid fa-fire text-blue-600 dark:text-blue-400 text-xl"></i>
+                </div>
+                <p class="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white" id="statActiveWeeks">0</p>
+                <p class="text-xs md:text-sm text-gray-500 dark:text-gray-400 mt-1">Minggu Aktif</p>
+                <p class="text-[10px] text-gray-400 dark:text-gray-500">dari 12 minggu</p>
+            </div>
+
+            <!-- Persentase Progress -->
+            <div class="glass-card rounded-2xl p-5 md:p-6 text-center">
+                <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900/40 rounded-xl flex items-center justify-center mx-auto mb-3">
+                    <i class="fa-solid fa-chart-pie text-purple-600 dark:text-purple-400 text-xl"></i>
+                </div>
+                <p class="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white" id="statPercentage">0%</p>
+                <p class="text-xs md:text-sm text-gray-500 dark:text-gray-400 mt-1">Progress Total</p>
+                <p class="text-[10px] text-gray-400 dark:text-gray-500">keseluruhan</p>
+            </div>
+
+            <!-- Streak Hari -->
+            <div class="glass-card rounded-2xl p-5 md:p-6 text-center">
+                <div class="w-12 h-12 bg-orange-100 dark:bg-orange-900/40 rounded-xl flex items-center justify-center mx-auto mb-3">
+                    <i class="fa-solid fa-bolt text-orange-600 dark:text-orange-400 text-xl"></i>
+                </div>
+                <p class="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white" id="statStreak">0</p>
+                <p class="text-xs md:text-sm text-gray-500 dark:text-gray-400 mt-1">Hari Berturut</p>
+                <p class="text-[10px] text-gray-400 dark:text-gray-500">streak belajar</p>
+            </div>
+        </div>
+
+        <!-- Quick Progress Overview -->
+        <div class="glass-card rounded-2xl p-6 md:p-8">
+            <h3 class="font-semibold text-lg mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-trophy text-yellow-500"></i> Progress Keseluruhan
+            </h3>
+            <div class="relative w-full h-6 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden shadow-inner">
+                <div id="overallProgressBar" class="absolute top-0 left-0 h-full bg-gradient-to-r from-primary to-accent rounded-full transition-all duration-700 ease-out flex items-center justify-end pr-2"
+                style="width: 0%;">
+                <span id="overallProgressLabel" class="text-white text-xs font-bold drop-shadow-md">0%</span>
+            </div>
+        </div>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-3 text-center" id="progressMotivation">
+            Mulai perjalanan belajarmu hari ini! 🚀
+        </p>
+    </div>
+</div>
+</section>
+
+<!-- ==================== TIMELINE 12 MINGGU ==================== -->
+<section id="timeline" class="py-12 md:py-16 bg-white/50 dark:bg-gray-900/50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-10">
+            <h2 class="text-3xl md:text-4xl font-bold mb-3">Timeline 12 Minggu</h2>
+            <p class="text-gray-500 dark:text-gray-400">Klik minggu untuk melihat detail harian</p>
+        </div>
+
+        <!-- Month Labels -->
+        <div class="flex justify-between mb-4 px-2 text-sm font-semibold">
+            <span class="text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-4 py-1.5 rounded-full">Bulan 1: Dasar Materi</span>
+            <span class="text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/30 px-4 py-1.5 rounded-full">Bulan 2: Pendalaman</span>
+            <span class="text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/30 px-4 py-1.5 rounded-full">Bulan 3: Tryout</span>
+        </div>
+
+        <!-- Timeline Scrollable -->
+        <div class="relative overflow-x-auto pb-4 -mx-4 px-4">
+            <div class="timeline-connector hidden md:block"></div>
+            <div class="flex gap-3 md:gap-4 min-w-max relative z-10" id="timelineContainer">
+                <!-- Generated by JS -->
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== DAILY PLANNER ==================== -->
+<section id="daily-planner" class="py-12 md:py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-8">
+            <h2 class="text-3xl md:text-4xl font-bold mb-3">Planner Harian</h2>
+            <p class="text-gray-500 dark:text-gray-400">Centang tugas yang sudah selesai — data otomatis tersimpan</p>
+        </div>
+
+        <!-- Week Navigator -->
+        <div class="flex items-center justify-between mb-6 glass-card rounded-2xl px-5 py-4">
+            <button id="prevWeekBtn" class="flex items-center gap-2 px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-all duration-200 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                <i class="fa-solid fa-chevron-left"></i> Sebelumnya
+            </button>
+            <div class="text-center">
+                <span class="text-lg md:text-xl font-bold" id="currentWeekLabel">Minggu 1</span>
+                <p class="text-xs text-gray-500 dark:text-gray-400" id="currentWeekFocus">Fokus: Dasar TWK</p>
+            </div>
+            <button id="nextWeekBtn" class="flex items-center gap-2 px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-all duration-200 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                Selanjutnya <i class="fa-solid fa-chevron-right"></i>
+            </button>
+        </div>
+
+        <!-- Daily Cards Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-3 md:gap-4" id="dailyCardsContainer">
+            <!-- Generated by JS -->
+        </div>
+
+        <!-- Week Progress Mini Bar -->
+        <div class="mt-6 glass-card rounded-2xl p-4 flex items-center gap-4">
+            <span class="text-sm font-semibold whitespace-nowrap">Minggu Ini:</span>
+            <div class="flex-1 h-4 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden shadow-inner">
+                <div id="weekMiniProgress" class="h-full bg-gradient-to-r from-blue-500 to-green-500 rounded-full transition-all duration-500 ease-out" style="width: 0%;"></div>
+            </div>
+            <span class="text-sm font-bold whitespace-nowrap" id="weekMiniLabel">0/7</span>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== PROGRESS TRACKER & CHART ==================== -->
+<section id="progress" class="py-12 md:py-16 bg-white/50 dark:bg-gray-900/50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-10">
+            <h2 class="text-3xl md:text-4xl font-bold mb-3">Progress Tracker</h2>
+            <p class="text-gray-500 dark:text-gray-400">Visualisasi progres per minggu dan statistik belajar</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Chart.js Bar Chart -->
+            <div class="glass-card rounded-2xl p-6">
+                <h3 class="font-semibold text-lg mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-chart-bar text-primary"></i> Progress per Minggu
+                </h3>
+                <div class="relative w-full" style="height: 320px;">
+                    <canvas id="weeklyChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Weekly Progress Bars -->
+            <div class="glass-card rounded-2xl p-6">
+                <h3 class="font-semibold text-lg mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-list-check text-accent"></i> Detail per Minggu
+                </h3>
+                <div class="space-y-3 max-h-[320px] overflow-y-auto pr-2" id="weeklyProgressBars">
+                    <!-- Generated by JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Reset Button -->
+        <div class="text-center mt-8">
+            <button id="resetBtn" class="inline-flex items-center gap-2 px-6 py-3 bg-red-500 hover:bg-red-600 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 text-sm">
+                <i class="fa-solid fa-rotate-left"></i> Reset Semua Progress
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== MOTIVATIONAL BANNER ==================== -->
+<section id="motivation" class="py-12 md:py-16 relative overflow-hidden">
+    <div class="absolute inset-0 -z-10 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 dark:from-primary/5 dark:via-accent/5 dark:to-primary/5"></div>
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div class="glass-card rounded-3xl p-8 md:p-12">
+            <i class="fa-solid fa-star text-5xl text-yellow-500 mb-4 animate-bounce-slow"></i>
+            <h3 class="text-2xl md:text-3xl font-bold mb-4">✨ Kamu Pasti Bisa! ✨</h3>
+            <p class="text-lg text-gray-600 dark:text-gray-300 leading-relaxed max-w-2xl mx-auto">
+                Setiap tugas yang kamu centang adalah satu langkah lebih dekat menuju kelulusan CPNS. Konsistensi adalah kunci. Tetap semangat dan jangan menyerah!
+            </p>
+            <div class="mt-6 flex flex-wrap gap-3 justify-center">
+                <span class="px-4 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-sm font-medium">💪 Disiplin</span>
+                <span class="px-4 py-2 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-full text-sm font-medium">🎯 Fokus</span>
+                <span class="px-4 py-2 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full text-sm font-medium">🔥 Konsisten</span>
+                <span class="px-4 py-2 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 rounded-full text-sm font-medium">🏆 Juara</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== FOOTER ==================== -->
+<footer class="py-8 bg-gray-100 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div class="flex items-center justify-center gap-2 mb-3">
+            <div class="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
+                <i class="fa-solid fa-graduation-cap text-white text-sm"></i>
+            </div>
+            <span class="font-bold text-lg bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">CPNS-Ready</span>
+        </div>
+        <p class="text-sm text-gray-500 dark:text-gray-400">
+            © 2026 CPNS-Ready. Dibuat untuk membantu persiapan CPNS Indonesia.
+        </p>
+        <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">
+            Data tersimpan lokal di browser Anda • Progress tidak hilang saat refresh
+        </p>
+    </div>
+</footer>
+
+<!-- ==================== SCRIPTS ==================== -->
+<script>
+    (function() {
+        // ==================== MOTIVATION QUOTES ====================
+        const quotes = [
+            { text: "Orang sukses adalah orang yang melakukan kebiasaan kecil setiap hari menuju tujuan besarnya.", author: "Anonim" },
+            { text: "Jangan berhenti ketika lelah. Berhentilah ketika selesai.", author: "Anonim" },
+            { text: "Kesuksesan adalah hasil dari persiapan, kerja keras, dan belajar dari kegagalan.", author: "Colin Powell" },
+            { text: "Mulailah dari mana kamu berada, gunakan apa yang kamu punya, lakukan apa yang kamu bisa.", author: "Arthur Ashe" },
+            { text: "CPNS bukan hanya tentang kecerdasan, tapi tentang ketekunan dan strategi.", author: "Motivasi CPNS" },
+            { text: "Setiap soal adalah kesempatan untuk membuktikan kemampuanmu.", author: "Anonim" },
+            { text: "Belajar hari ini adalah investasi untuk masa depan.", author: "Anonim" },
+            { text: "Kamu tidak harus hebat untuk memulai, tapi kamu harus memulai untuk menjadi hebat.", author: "Zig Ziglar" },
+            { text: "Disiplin adalah jembatan antara tujuan dan pencapaian.", author: "Jim Rohn" },
+            { text: "Satu-satunya cara untuk melakukan pekerjaan hebat adalah dengan mencintai apa yang kamu lakukan.", author: "Steve Jobs" },
+        ];
+
+        function getRandomQuote() {
+            return quotes[Math.floor(Math.random() * quotes.length)];
+        }
+
+        // ==================== STUDY PLAN DATA ====================
+        const monthLabels = ['Dasar Materi', 'Pendalaman & Latihan', 'Tryout & Evaluasi'];
+        const monthSubjects = [
+            ['TWK dasar', 'TIU numerik', 'TKP konsep', 'Pengenalan CAT'],
+            ['Latihan soal intensif', 'Pembahasan jawaban', 'Simulasi CAT', 'Manajemen waktu'],
+            ['Full tryout mingguan', 'Evaluasi kelemahan', 'Review materi penting', 'Persiapan mental'],
+        ];
+
+        const dayNames = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+
+        // Generate 12 weeks of dummy data
+        function generateStudyPlan() {
+            const plan = [];
+            const subjectsTWK = [
+                'Pancasila - Dasar & Sejarah', 'UUD 1945 & Amandemen', 'Bhineka Tunggal Ika',
+                'NKRI & Wawasan Kebangsaan', 'Sistem Pemerintahan Indonesia', 'Sejarah Nasional',
+                'Hak & Kewajiban Warga Negara', 'Pilar Kebangsaan', 'Integritas Nasional',
+                'Bela Negara', 'Demokrasi Pancasila', 'Reformasi Birokrasi'
+            ];
+            const subjectsTIU = [
+                'Numerik - Aritmatika Dasar', 'Numerik - Deret Angka', 'Numerik - Perbandingan',
+                'Verbal - Sinonim Antonim', 'Verbal - Analogi', 'Verbal - Pemahaman Wacana',
+                'Logika - Silogisme', 'Logika - Penalaran Analitis', 'Figural - Pola Gambar',
+                'Figural - Rotasi & Refleksi', 'Numerik - Soal Cerita', 'Logika - Pernyataan'
+            ];
+            const subjectsTKP = [
+                'Integritas Diri', 'Semangat Berprestasi', 'Orientasi Pelayanan',
+                'Kemampuan Adaptasi', 'Kerja Sama Tim', 'Kreativitas & Inovasi',
+                'Pengendalian Diri', 'Kepemimpinan', 'Profesionalisme',
+                'Etika Publik', 'Pelayanan Publik', 'Jejaring Kerja'
+            ];
+            const catSubjects = [
+                'Pengenalan Format CAT', 'Latihan CAT - TWK', 'Latihan CAT - TIU',
+                'Latihan CAT - TKP', 'Simulasi CAT Penuh', 'Review Hasil CAT',
+                'Strategi CAT', 'Manajemen Waktu CAT', 'Tryout CAT 1',
+                'Tryout CAT 2', 'Tryout CAT 3', 'Evaluasi Final CAT'
+            ];
+
+            const durations = ['1 jam', '1.5 jam', '2 jam', '2.5 jam', '3 jam', '1 jam', '2 jam'];
+
+            for (let week = 1; week <= 12; week++) {
+                const monthIndex = week <= 4 ? 0 : week <= 8 ? 1 : 2;
+                const focusPrefix = monthIndex === 0 ? 'Dasar' : monthIndex === 1 ? 'Pendalaman' : 'Tryout';
+
+                let focusArea = '';
+                if (week === 1 || week === 5 || week === 9) focusArea = `${focusPrefix} TWK & Pengenalan`;
+                else if (week === 2 || week === 6 || week === 10) focusArea = `${focusPrefix} TIU & Numerik`;
+                else if (week === 3 || week === 7 || week === 11) focusArea = `${focusPrefix} TKP & Karakteristik`;
+                else focusArea = `${focusPrefix} CAT & Simulasi`;
+
+                const days = [];
+                for (let d = 0; d < 7; d++) {
+                    const dayIndex = d;
+                    const isSunday = dayIndex === 6;
+                    let material, target, duration, subjectType;
+
+                    if (isSunday) {
+                        material = 'Review Ringan & Istirahat Aktif';
+                        target = 'Mengulang materi minggu ini secara santai';
+                        duration = '1 jam';
+                        subjectType = 'Review';
+                    } else {
+                        const subjectPool = week <= 4 ?
+                            [subjectsTWK, subjectsTIU, subjectsTKP, catSubjects] :
+                            week <= 8 ?
+                            [subjectsTIU, subjectsTKP, subjectsTWK, catSubjects] :
+                            [catSubjects, subjectsTWK, subjectsTIU, subjectsTKP];
+
+                        const poolIndex = d % 4;
+                        const subjIdx = (week - 1 + d) % 12;
+                        material = subjectPool[poolIndex][subjIdx];
+                        target = `Memahami dan menguasai ${material.toLowerCase()}`;
+                        duration = durations[(week + d) % 7];
+                        subjectType = poolIndex === 0 ? (week <= 4 ? 'TWK' : week <= 8 ? 'TIU' : 'CAT') :
+                            poolIndex === 1 ? (week <= 4 ? 'TIU' : week <= 8 ? 'TKP' : 'TWK') :
+                            poolIndex === 2 ? (week <= 4 ? 'TKP' : week <= 8 ? 'TWK' : 'TIU') : 'CAT';
+                    }
+
+                    days.push({
+                        day: dayNames[dayIndex],
+                        material,
+                        target,
+                        duration,
+                        subjectType,
+                        completed: false,
+                    });
+                }
+                plan.push({
+                    week,
+                    month: monthIndex + 1,
+                    focus: focusArea,
+                    days,
+                });
+            }
+            return plan;
+        }
+
+        const studyPlan = generateStudyPlan();
+
+        // ==================== STATE MANAGEMENT ====================
+        const STORAGE_KEY = 'cpns-ready-progress';
+        let currentWeekIndex = 0; // 0-11
+        let progressData = {}; // { "week-dayIndex": true/false }
+
+        function loadProgress() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    progressData = JSON.parse(saved);
+                }
+            } catch (e) {
+                progressData = {};
+            }
+            // Apply loaded data to studyPlan
+            studyPlan.forEach((weekData, wIdx) => {
+                weekData.days.forEach((dayData, dIdx) => {
+                    const key = `${wIdx}-${dIdx}`;
+                    if (progressData[key] === true) {
+                        dayData.completed = true;
+                    } else {
+                        dayData.completed = false;
+                    }
+                });
+            });
+        }
+
+        function saveProgress() {
+            const data = {};
+            studyPlan.forEach((weekData, wIdx) => {
+                weekData.days.forEach((dayData, dIdx) => {
+                    if (dayData.completed) {
+                        data[`${wIdx}-${dIdx}`] = true;
+                    }
+                });
+            });
+            progressData = data;
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(progressData));
+            } catch (e) {
+                // localStorage might be full
+            }
+        }
+
+        function getTotalCompleted() {
+            let count = 0;
+            studyPlan.forEach(w => w.days.forEach(d => { if (d.completed) count++; }));
+            return count;
+        }
+
+        function getTotalTasks() {
+            return 12 * 7; // 84
+        }
+
+        function getOverallPercentage() {
+            return Math.round((getTotalCompleted() / getTotalTasks()) * 100);
+        }
+
+        function getActiveWeeks() {
+            let count = 0;
+            studyPlan.forEach(w => {
+                if (w.days.some(d => d.completed)) count++;
+            });
+            return count;
+        }
+
+        function getWeekCompletedCount(weekIndex) {
+            return studyPlan[weekIndex].days.filter(d => d.completed).length;
+        }
+
+        function getWeekPercentage(weekIndex) {
+            return Math.round((getWeekCompletedCount(weekIndex) / 7) * 100);
+        }
+
+        function getStreak() {
+            // Calculate consecutive days with completed tasks (going backwards from today-ish)
+            let streak = 0;
+            const allDays = [];
+            studyPlan.forEach((w, wi) => {
+                w.days.forEach((d, di) => {
+                    allDays.push({ completed: d.completed, week: wi, day: di });
+                });
+            });
+            // Reverse to go from latest to earliest
+            for (let i = allDays.length - 1; i >= 0; i--) {
+                if (allDays[i].completed) streak++;
+                else break;
+            }
+            return streak;
+        }
+
+        // ==================== DARK MODE ====================
+        function applyDarkMode(isDark) {
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+                document.getElementById('darkModeKnob').style.transform = 'translateX(28px)';
+                document.getElementById('darkModeIcon').className = 'fa-solid fa-moon text-blue-300 text-xs';
+            } else {
+                document.documentElement.classList.remove('dark');
+                document.getElementById('darkModeKnob').style.transform = 'translateX(0px)';
+                document.getElementById('darkModeIcon').className = 'fa-solid fa-sun text-yellow-500 text-xs';
+            }
+        }
+
+        function toggleDarkMode() {
+            const isDark = !document.documentElement.classList.contains('dark');
+            applyDarkMode(isDark);
+            localStorage.setItem('cpns-ready-darkmode', isDark ? 'dark' : 'light');
+        }
+
+        function loadDarkModePreference() {
+            const pref = localStorage.getItem('cpns-ready-darkmode');
+            if (pref === 'dark') {
+                applyDarkMode(true);
+            } else if (pref === 'light') {
+                applyDarkMode(false);
+            } else {
+                // Check system preference
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                applyDarkMode(prefersDark);
+            }
+        }
+
+        // ==================== CONFETTI ====================
+        const confettiCanvas = document.getElementById('confetti-canvas');
+        const confettiCtx = confettiCanvas.getContext('2d');
+        let confettiParticles = [];
+        let confettiAnimationId = null;
+        let confettiTriggered = false;
+
+        function resizeConfettiCanvas() {
+            confettiCanvas.width = window.innerWidth;
+            confettiCanvas.height = window.innerHeight;
+        }
+
+        function createConfettiParticle() {
+            return {
+                x: Math.random() * confettiCanvas.width,
+                y: -20 - Math.random() * 100,
+                w: Math.random() * 10 + 5,
+                h: Math.random() * 6 + 3,
+                color: ['#2563eb', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4'][Math.floor(
+                    Math.random() * 7)],
+                speedY: Math.random() * 3 + 2,
+                speedX: (Math.random() - 0.5) * 3,
+                rotation: Math.random() * 360,
+                rotSpeed: (Math.random() - 0.5) * 8,
+                opacity: 1,
+            };
+        }
+
+        function startConfetti() {
+            if (confettiTriggered && confettiAnimationId) return;
+            confettiTriggered = true;
+            resizeConfettiCanvas();
+            confettiParticles = [];
+            for (let i = 0; i < 180; i++) {
+                confettiParticles.push(createConfettiParticle());
+            }
+            animateConfetti();
+        }
+
+        function animateConfetti() {
+            confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+            let allDone = true;
+
+            confettiParticles.forEach((p, i) => {
+                p.y += p.speedY;
+                p.x += p.speedX;
+                p.rotation += p.rotSpeed;
+                if (p.y > confettiCanvas.height + 50) {
+                    p.opacity -= 0.02;
+                }
+                if (p.opacity <= 0) {
+                    confettiParticles[i] = null;
+                    return;
+                }
+                allDone = false;
+                confettiCtx.save();
+                confettiCtx.globalAlpha = Math.max(0, p.opacity);
+                confettiCtx.translate(p.x, p.y);
+                confettiCtx.rotate((p.rotation * Math.PI) / 180);
+                confettiCtx.fillStyle = p.color;
+                confettiCtx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+                confettiCtx.restore();
+            });
+
+            confettiParticles = confettiParticles.filter(p => p !== null);
+
+            if (allDone && confettiParticles.length === 0) {
+                confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+                confettiAnimationId = null;
+                confettiTriggered = false;
+                return;
+            }
+            confettiAnimationId = requestAnimationFrame(animateConfetti);
+        }
+
+        function checkConfettiTrigger() {
+            const pct = getOverallPercentage();
+            if (pct >= 100 && !confettiTriggered) {
+                startConfetti();
+                // Also re-trigger after a delay if still at 100%
+                setTimeout(() => {
+                    if (getOverallPercentage() >= 100 && !confettiTriggered) {
+                        startConfetti();
+                    }
+                }, 4000);
+            }
+        }
+
+        // ==================== RENDER FUNCTIONS ====================
+
+        // Render quote
+        function renderQuote() {
+            const quote = getRandomQuote();
+            document.getElementById('quoteText').textContent = `"${quote.text}"`;
+            document.getElementById('quoteAuthor').textContent = `— ${quote.author}`;
+        }
+
+        // Render dashboard stats
+        function renderDashboardStats() {
+            document.getElementById('statCompleted').textContent = getTotalCompleted();
+            document.getElementById('statActiveWeeks').textContent = getActiveWeeks();
+            document.getElementById('statPercentage').textContent = getOverallPercentage() + '%';
+            document.getElementById('statStreak').textContent = getStreak();
+
+            // Overall progress bar
+            const pct = getOverallPercentage();
+            document.getElementById('overallProgressBar').style.width = pct + '%';
+            document.getElementById('overallProgressLabel').textContent = pct + '%';
+
+            // Motivation text
+            const motivationEl = document.getElementById('progressMotivation');
+            if (pct === 0) {
+                motivationEl.textContent = 'Mulai perjalanan belajarmu hari ini! 🚀';
+            } else if (pct < 30) {
+                motivationEl.textContent = 'Awal yang bagus! Teruskan langkahmu! 💪';
+            } else if (pct < 60) {
+                motivationEl.textContent = 'Kamu di jalur yang tepat! Tetap konsisten! 🎯';
+            } else if (pct < 90) {
+                motivationEl.textContent = 'Hampir sampai! Jangan menyerah sekarang! 🔥';
+            } else if (pct < 100) {
+                motivationEl.textContent = 'Sedikit lagi menuju 100%! Kamu luar biasa! 🌟';
+            } else {
+                motivationEl.textContent = '🎉 SELAMAT! Semua tugas selesai! Saatnya tryout final! 🏆';
+            }
+        }
+
+        // Render timeline
+        function renderTimeline() {
+            const container = document.getElementById('timelineContainer');
+            container.innerHTML = '';
+
+            studyPlan.forEach((weekData, index) => {
+                const weekPct = getWeekPercentage(index);
+                const isActive = index === currentWeekIndex;
+                const monthColors = [
+                    'border-blue-400 bg-blue-50 dark:bg-blue-900/20',
+                    'border-purple-400 bg-purple-50 dark:bg-purple-900/20',
+                    'border-green-400 bg-green-50 dark:bg-green-900/20',
+                ];
+                const monthIndex = weekData.month - 1;
+                const borderColor = monthColors[monthIndex];
+
+                const card = document.createElement('div');
+                card.className =
+                    `flex-shrink-0 w-36 md:w-44 p-4 rounded-2xl border-2 cursor-pointer transition-all duration-300 transform hover:scale-105 ${borderColor} ${isActive ? 'ring-4 ring-primary shadow-xl scale-105' : 'shadow-md hover:shadow-lg'}`;
+                card.innerHTML = `
+                    <div class="text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">Minggu ${weekData.week}</div>
+                    <div class="text-sm font-semibold leading-tight mb-2">${weekData.focus}</div>
+                    <div class="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden mb-1">
+                        <div class="h-full bg-gradient-to-r from-blue-500 to-green-500 rounded-full transition-all duration-500" style="width: ${weekPct}%;"></div>
+                    </div>
+                    <div class="text-xs text-gray-500 dark:text-gray-400">${weekPct}% • ${getWeekCompletedCount(index)}/7</div>
+                    ${isActive ? '<div class="mt-2 text-xs font-bold text-primary">📍 Dipilih</div>' : ''}
+                `;
+                card.addEventListener('click', () => {
+                    currentWeekIndex = index;
+                    renderAll();
+                    document.getElementById('daily-planner').scrollIntoView({ behavior: 'smooth' });
+                });
+                container.appendChild(card);
+            });
+        }
+
+        // Render daily planner
+        function renderDailyPlanner() {
+            const weekData = studyPlan[currentWeekIndex];
+            document.getElementById('currentWeekLabel').textContent = `Minggu ${weekData.week} (Bulan ${weekData.month})`;
+            document.getElementById('currentWeekFocus').textContent = `Fokus: ${weekData.focus}`;
+
+            // Update prev/next buttons
+            document.getElementById('prevWeekBtn').disabled = currentWeekIndex === 0;
+            document.getElementById('nextWeekBtn').disabled = currentWeekIndex === 11;
+
+            // Render daily cards
+            const container = document.getElementById('dailyCardsContainer');
+            container.innerHTML = '';
+
+            const subjectColors = {
+                'TWK': { bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-700 dark:text-red-300',
+                icon: 'fa-landmark' },
+                'TIU': { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-700 dark:text-blue-300',
+                    icon: 'fa-brain' },
+                'TKP': { bg: 'bg-purple-100 dark:bg-purple-900/30', text: 'text-purple-700 dark:text-purple-300',
+                    icon: 'fa-users' },
+                'CAT': { bg: 'bg-orange-100 dark:bg-orange-900/30', text: 'text-orange-700 dark:text-orange-300',
+                    icon: 'fa-desktop' },
+                'Review': { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-700 dark:text-green-300',
+                    icon: 'fa-book-open' },
+            };
+
+            weekData.days.forEach((dayData, dayIndex) => {
+                const sc = subjectColors[dayData.subjectType] || subjectColors['Review'];
+                const isSunday = dayData.day === 'Minggu';
+                const card = document.createElement('div');
+                card.className =
+                    `glass-card rounded-2xl p-4 flex flex-col gap-3 relative ${isSunday ? 'border-dashed border-2 border-green-300 dark:border-green-700' : ''} ${dayData.completed ? 'ring-2 ring-green-400 dark:ring-green-500' : ''}`;
+
+                card.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">${dayData.day}</span>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold ${sc.bg} ${sc.text} flex items-center gap-1">
+                            <i class="fa-solid ${sc.icon} text-[10px]"></i> ${dayData.subjectType}
+                        </span>
+                    </div>
+                    <h4 class="font-semibold text-sm leading-tight flex-1">${dayData.material}</h4>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 line-clamp-2">${dayData.target}</p>
+                    <div class="flex items-center justify-between mt-auto pt-2 border-t border-gray-100 dark:border-gray-700">
+                        <span class="text-xs font-medium text-gray-500 dark:text-gray-400"><i class="fa-regular fa-clock mr-1"></i>${dayData.duration}</span>
+                        <label class="flex items-center gap-2 cursor-pointer" title="Tandai selesai">
+                            <input type="checkbox" class="custom-checkbox day-checkbox" data-week="${currentWeekIndex}" data-day="${dayIndex}" ${dayData.completed ? 'checked' : ''}>
+                            <span class="text-xs font-medium ${dayData.completed ? 'text-green-600 dark:text-green-400' : 'text-gray-400'}">${dayData.completed ? '✅ Selesai' : 'Centang'}</span>
+                        </label>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            // Update week mini progress
+            const weekCompleted = getWeekCompletedCount(currentWeekIndex);
+            const weekPct = getWeekPercentage(currentWeekIndex);
+            document.getElementById('weekMiniProgress').style.width = weekPct + '%';
+            document.getElementById('weekMiniLabel').textContent = `${weekCompleted}/7`;
+        }
+
+        // Render progress section
+        function renderProgressSection() {
+            // Weekly progress bars
+            const barsContainer = document.getElementById('weeklyProgressBars');
+            barsContainer.innerHTML = '';
+            studyPlan.forEach((weekData, index) => {
+                const pct = getWeekPercentage(index);
+                const completed = getWeekCompletedCount(index);
+                const barColor = pct === 100 ? 'from-green-400 to-green-600' :
+                    pct >= 50 ? 'from-blue-400 to-blue-600' :
+                    pct > 0 ? 'from-yellow-400 to-orange-500' : 'from-gray-300 to-gray-400';
+
+                const div = document.createElement('div');
+                div.className = 'flex items-center gap-3';
+                div.innerHTML = `
+                    <span class="text-xs font-semibold w-16 text-right">Mg ${weekData.week}</span>
+                    <div class="flex-1 h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden shadow-inner">
+                        <div class="h-full bg-gradient-to-r ${barColor} rounded-full transition-all duration-600 ease-out" style="width: ${pct}%;"></div>
+                    </div>
+                    <span class="text-xs font-bold w-12">${completed}/7</span>
+                    <span class="text-xs font-semibold w-10 text-right ${pct === 100 ? 'text-green-600 dark:text-green-400' : 'text-gray-500'}">${pct}%</span>
+                `;
+                barsContainer.appendChild(div);
+            });
+
+            // Update chart
+            updateChart();
+        }
+
+        // Chart.js
+        let weeklyChartInstance = null;
+
+        function updateChart() {
+            const ctx = document.getElementById('weeklyChart').getContext('2d');
+            const labels = studyPlan.map(w => `Mg ${w.week}`);
+            const data = studyPlan.map((_, i) => getWeekPercentage(i));
+            const completedData = studyPlan.map((_, i) => getWeekCompletedCount(i));
+
+            const isDark = document.documentElement.classList.contains('dark');
+            const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)';
+            const textColor = isDark ? '#9ca3af' : '#6b7280';
+
+            if (weeklyChartInstance) {
+                weeklyChartInstance.destroy();
+            }
+
+            weeklyChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Progress (%)',
+                        data: data,
+                        backgroundColor: data.map(p =>
+                            p === 100 ? 'rgba(34,197,94,0.8)' :
+                            p >= 50 ? 'rgba(37,99,235,0.7)' :
+                            p > 0 ? 'rgba(245,158,11,0.6)' : 'rgba(156,163,175,0.4)'
+                        ),
+                        borderColor: data.map(p =>
+                            p === 100 ? '#22c55e' : p >= 50 ? '#2563eb' : p > 0 ? '#f59e0b' :
+                            '#9ca3af'
+                        ),
+                        borderWidth: 2,
+                        borderRadius: 8,
+                        borderSkipped: false,
+                    }],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(ctx) {
+                                    const i = ctx.dataIndex;
+                                    return `Progress: ${data[i]}% (${completedData[i]}/7 tugas)`;
+                                },
+                            },
+                        },
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: { callback: v => v + '%', color: textColor },
+                            grid: { color: gridColor },
+                        },
+                        x: {
+                            ticks: { color: textColor },
+                            grid: { color: gridColor },
+                        },
+                    },
+                },
+            });
+        }
+
+        // ==================== EVENT HANDLERS ====================
+        function handleCheckboxChange(weekIndex, dayIndex, checked) {
+            studyPlan[weekIndex].days[dayIndex].completed = checked;
+            saveProgress();
+            renderAll();
+            checkConfettiTrigger();
+        }
+
+        function setupCheckboxListeners() {
+            document.querySelectorAll('.day-checkbox').forEach(cb => {
+                // Remove existing listener to avoid duplicates
+                const newCb = cb.cloneNode(true);
+                cb.parentNode.replaceChild(newCb, cb);
+                newCb.addEventListener('change', function() {
+                    const weekIdx = parseInt(this.dataset.week);
+                    const dayIdx = parseInt(this.dataset.day);
+                    handleCheckboxChange(weekIdx, dayIdx, this.checked);
+                });
+            });
+        }
+
+        function renderAll() {
+            renderDashboardStats();
+            renderTimeline();
+            renderDailyPlanner();
+            renderProgressSection();
+            // Re-attach listeners after DOM update
+            setTimeout(setupCheckboxListeners, 50);
+        }
+
+        // ==================== INITIALIZATION ====================
+        function init() {
+            loadDarkModePreference();
+            loadProgress();
+            renderQuote();
+            renderAll();
+
+            // Set initial current week to first incomplete week, or week 1
+            let foundIncomplete = false;
+            for (let i = 0; i < 12; i++) {
+                if (getWeekCompletedCount(i) < 7) {
+                    currentWeekIndex = i;
+                    foundIncomplete = true;
+                    break;
+                }
+            }
+            if (!foundIncomplete) currentWeekIndex = 11; // All complete, show last week
+            renderAll();
+
+            // Event Listeners
+            document.getElementById('darkModeToggle').addEventListener('click', toggleDarkMode);
+
+            document.getElementById('prevWeekBtn').addEventListener('click', () => {
+                if (currentWeekIndex > 0) {
+                    currentWeekIndex--;
+                    renderAll();
+                    document.getElementById('daily-planner').scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+
+            document.getElementById('nextWeekBtn').addEventListener('click', () => {
+                if (currentWeekIndex < 11) {
+                    currentWeekIndex++;
+                    renderAll();
+                    document.getElementById('daily-planner').scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+
+            // Reset button
+            document.getElementById('resetBtn').addEventListener('click', () => {
+                if (confirm(
+                        'Apakah Anda yakin ingin mereset semua progress? Data yang sudah dicentang akan hilang dan tidak bisa dikembalikan.'
+                        )) {
+                    studyPlan.forEach(w => w.days.forEach(d => d.completed = false));
+                    progressData = {};
+                    localStorage.removeItem(STORAGE_KEY);
+                    currentWeekIndex = 0;
+                    confettiTriggered = false;
+                    if (confettiAnimationId) {
+                        cancelAnimationFrame(confettiAnimationId);
+                        confettiAnimationId = null;
+                        confettiParticles = [];
+                        confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+                    }
+                    renderAll();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            });
+
+            // Mobile menu
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+            document.querySelectorAll('.mobile-nav-link').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                });
+            });
+
+            // Smooth scroll for all anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    const href = this.getAttribute('href');
+                    if (href === '#') return;
+                    const target = document.querySelector(href);
+                    if (target) {
+                        e.preventDefault();
+                        target.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            });
+
+            // Navbar shadow on scroll
+            window.addEventListener('scroll', () => {
+                const navbar = document.getElementById('navbar');
+                if (window.scrollY > 20) {
+                    navbar.classList.add('shadow-xl');
+                } else {
+                    navbar.classList.remove('shadow-xl');
+                }
+            });
+
+            // Resize confetti canvas
+            window.addEventListener('resize', resizeConfettiCanvas);
+
+            // Keyboard navigation for weeks
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowLeft' && currentWeekIndex > 0 && document.activeElement === document
+                    .body) {
+                    currentWeekIndex--;
+                    renderAll();
+                    document.getElementById('daily-planner').scrollIntoView({ behavior: 'smooth' });
+                } else if (e.key === 'ArrowRight' && currentWeekIndex < 11 && document.activeElement ===
+                    document.body) {
+                    currentWeekIndex++;
+                    renderAll();
+                    document.getElementById('daily-planner').scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+
+            // Check confetti on load (in case all tasks already completed)
+            setTimeout(checkConfettiTrigger, 500);
+
+            console.log('🚀 CPNS-Ready initialized!');
+            console.log('📊 Total tasks:', getTotalTasks());
+            console.log('✅ Completed:', getTotalCompleted());
+            console.log('📈 Overall progress:', getOverallPercentage() + '%');
+            console.log('💡 Tip: Gunakan tombol panah kiri/kanan untuk navigasi minggu!');
+        }
+
+        // Start the app
+        init();
+    })();
+</script>
+</body>
+</html>
